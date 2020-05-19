@@ -75,8 +75,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             String name = authentication.getPrincipal() + "";
             String password = authentication.getCredentials() + "";
             User user = service.getByName(name);
-            System.out.println(name);
-            System.out.println(password);
 
             if (user == null) {
                 throw new BadCredentialsException("1000");

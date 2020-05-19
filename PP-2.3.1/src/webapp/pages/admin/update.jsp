@@ -1,4 +1,5 @@
-<%--
+<%@ page import="java.util.*" %>
+<%@ page import="CRUD.model.Role" %><%--
   Created by IntelliJ IDEA.
   User: ale-k
   Date: 11.05.2020
@@ -7,24 +8,23 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<jsp:useBean id="user" scope="request" type="CRUD.model.User"/>
 <%
     request.setCharacterEncoding("UTF-8");
-    boolean admin = (boolean) request.getAttribute("admin");
-    String role;
-    String changeRole;
-    if(admin) {
-        role = "user";
-        changeRole = "Лишить полномочий администратора";
-    }
-    else {
-        role = "admin";
-        changeRole = "Сделать администратором";
+    String userChecked = "";
+    String adminChecked = "";
+
+    for (Role role : user.getRoles()) {
+        if (role.getRole().equals("ROLE_user")) {
+            userChecked = "checked";
+        } else if(role.getRole().equals("ROLE_admin")) {
+            adminChecked = "checked";
+        }
     }
 %>
-<jsp:useBean id="user" scope="request" type="CRUD.model.User"/>
 <html>
 <head>
-    <title>Добавление пользователя</title>
+    <title>Редактирование пользователя</title>
 </head>
 <body>
 <form method="post">
@@ -42,7 +42,9 @@
         <input type="number" name="age" value="${user.age}"><br/>
     </label>
 
-    <input type="checkbox" name="role" value="<%= role%>"><%= changeRole%><br/>
+    <input type="checkbox" name="roles" value="user" <%= userChecked%>>Пользователь<br/>
+
+    <input type="checkbox" name="roles" value="admin" <%= adminChecked%>>Администратор<br/>
 
     <button type="submit">Сохранить</button>
 </form>

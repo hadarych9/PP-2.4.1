@@ -2,6 +2,7 @@ package CRUD.controller;
 
 import CRUD.model.Role;
 import CRUD.model.User;
+import CRUD.service.RoleService;
 import CRUD.service.SecurityService;
 import CRUD.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,8 @@ public class UserController {
 
     UserService userService;
 
+    RoleService roleService;
+
     SecurityService secService;
 
     @Autowired
@@ -27,12 +30,17 @@ public class UserController {
     }
 
     @Autowired
+    public void setRoleService(RoleService roleService) {
+        this.roleService = roleService;
+    }
+
+    @Autowired
     public void setSecurityService(SecurityService secService) {
         this.secService = secService;
     }
 
     @GetMapping("/admin/adminPage")
-    public void getMain(ModelMap modelMap){
+    public void getAdminPage(ModelMap modelMap){
         modelMap.addAttribute("userData", userService.getAllUsers());
     }
 
@@ -49,14 +57,16 @@ public class UserController {
     @PostMapping("/registration")
     public String registerUser(User user) {
         String password = user.getPassword();
-        if(userService.addUser(user, false)) secService.autoLogin(user.getUsername(), password);
+        Set<Role> roleSet = new HashSet<>();
+        roleSet.add(roleService.getByRole("user"));
+        user.setRoles(roleSet);
+        if(userService.addUser(user)) secService.autoLogin(user.getUsername(), password);
         return "redirect:/user";
     }
 
     @GetMapping("/user")
-    public ModelAndView showUserPage(ModelMap modelMap) {
+    public ModelAndView getUserPage(ModelMap modelMap) {
         User user = userService.getByName(secService.findLoggedInUsername());
-        System.out.println(user.getUsername());
         modelMap.addAttribute("user", user);
         return new ModelAndView("userPage");
     }
@@ -67,10 +77,15 @@ public class UserController {
     }
 
     @PostMapping("/admin/add")
-    public String addUser(User user, String role) {
-        boolean admin = false;
-        if(role != null) admin = true;
-        userService.addUser(user, admin);
+    public String addUser(User user, String[] roles) {
+        Set<Role> roleSet = new HashSet<>();
+        if(roles != null && roles.length != 0){
+            for(String roleName : roles) roleSet.add(roleService.getByRole(roleName));
+        } else {
+            roleSet.add(roleService.getByRole("user"));
+        }
+        user.setRoles(roleSet);
+        userService.addUser(user);
         return "redirect:/admin/adminPage";
     }
 
@@ -78,16 +93,7 @@ public class UserController {
     public String updateUser(ModelMap modelMap, @RequestParam("id")Long id) {
         User user = userService.getById(id);
         if(user != null) {
-            Set<Role> rolesSet = user.getRoles();
-            boolean admin = false;
-            for (Role role : rolesSet) {
-                if (role.getRole().equals("ROLE_admin")) {
-                    admin = true;
-                    break;
-                }
-            }
             modelMap.addAttribute("user", user);
-            modelMap.addAttribute("admin", admin);
             return null;
         } else {
             return "redirect:/admin/adminPage";
@@ -95,13 +101,13 @@ public class UserController {
     }
 
     @PostMapping("/admin/update")
-    public String updateUser(User user, String role) {
-        Boolean admin = null;
-        if(role != null) {
-            if(role.equals("admin")) admin = true;
-            else admin = false;
+    public String updateUser(User user, String[] roles) {
+        Set<Role> roleSet = new HashSet<>();
+        if(roles != null && roles.length != 0){
+            for(String roleName : roles) roleSet.add(roleService.getByRole(roleName));
+            user.setRoles(roleSet);
         }
-        userService.updateUser(user, admin);
+        userService.updateUser(user);
         return "redirect:/admin/adminPage";
     }
 
@@ -114,6 +120,7 @@ public class UserController {
     @GetMapping("/admin/drop")
     public String dropTable() {
         userService.dropTable();
+        roleService.dropTable();
         return "redirect:/admin/adminPage";
     }
 }

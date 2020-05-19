@@ -1,5 +1,7 @@
 package CRUD.config;
 
+import CRUD.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
@@ -37,5 +39,4 @@ public class AppInit extends AbstractAnnotationConfigDispatcherServletInitialize
         characterEncodingFilter.setEncoding("UTF-8");
         return new Filter[] { characterEncodingFilter};
     }
-
 }

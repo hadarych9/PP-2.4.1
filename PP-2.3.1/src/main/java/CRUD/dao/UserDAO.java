@@ -45,13 +45,16 @@ public class UserDAO {
         return user;
     }
 
+    /*public void deleteRoles(User user){
+        Set<Role> roles = user.getRoles();
+        for(Role role : roles){
+            sessionFactory.getCurrentSession().delete(role);
+        }
+    }*/
+
     public void deleteUser(Long id) {
         Session session = sessionFactory.getCurrentSession();
         User user = getById(id);
-        Set<Role> roles = user.getRoles();
-        for(Role role : roles){
-            session.delete(role);
-        }
         session.delete(user);
     }
 
@@ -64,10 +67,6 @@ public class UserDAO {
         }
         existingUser.setAge(user.getAge());
         if(user.getRoles() != null) {
-            Set<Role> roles = existingUser.getRoles();
-            for(Role role : roles) {
-                session.delete(role);
-            }
             existingUser.setRoles(user.getRoles());
         }
         sessionFactory.getCurrentSession().save(existingUser);
@@ -80,6 +79,5 @@ public class UserDAO {
     public void dropTable() {
         Session session = sessionFactory.getCurrentSession();
         session.createQuery("DELETE FROM User").executeUpdate();
-        session.createQuery("DELETE FROM Role").executeUpdate();
     }
 }

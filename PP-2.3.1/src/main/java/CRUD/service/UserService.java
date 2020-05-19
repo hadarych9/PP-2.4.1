@@ -34,18 +34,9 @@ public class UserService implements UserDetailsService {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
-    public Set<Role> createRoleSet(boolean admin){
-        Set<Role> roles = new HashSet<>();
-        roles.add(new Role("ROLE_user"));
-        if(admin) roles.add(new Role("ROLE_admin"));
-        return roles;
-    }
-
-    public boolean addUser(User user, boolean admin){
+    public boolean addUser(User user){
         if (doesUserNotExist(user.getUsername())) {
             user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-            Set<Role> roles = createRoleSet(admin);
-            user.setRoles(roles);
             dao.addUser(user);
             return true;
         } else return false;
@@ -59,12 +50,8 @@ public class UserService implements UserDetailsService {
         return (List) dao.getAllUsers();
     }
 
-    public void updateUser(User user, Boolean admin){
+    public void updateUser(User user){
         if(!user.getPassword().equals("")) user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        if(admin != null){
-            Set<Role> roles = createRoleSet(admin);
-            user.setRoles(roles);
-        }
         dao.updateUser(user);
     }
 

@@ -17,9 +17,8 @@ public class Role implements GrantedAuthority {
     @Column(name = "role")
     private String role;
 
-    /*@ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id")
-    private User user;*/
+    @ManyToMany(mappedBy = "roles")
+    private Set<User> users;
 
     public Role(){}
 
@@ -48,13 +47,13 @@ public class Role implements GrantedAuthority {
         this.role = name;
     }
 
-    /*public User getUser() {
-        return user;
+    public Set<User> getUsers() {
+        return users;
     }
 
-    public void setUser(User user) {
-        this.user = user;
-    }*/
+    public void setUsers(Set<User> users) {
+        this.users = users;
+    }
 
     @Override
     public String toString() {

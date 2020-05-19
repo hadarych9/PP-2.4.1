@@ -27,7 +27,9 @@
         <input type="number" name="age"><br/>
     </label>
 
-    <input type="checkbox" name="role" value="ROLE_admin">Администратор<br/>
+    <input type="checkbox" name="roles" value="user">Пользователь<br/>
+
+    <input type="checkbox" name="roles" value="admin">Администратор<br/>
 
     <button type="submit">Сохранить</button>
 </form>
